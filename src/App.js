@@ -1,50 +1,53 @@
-import logo from "./logo.svg";
 import "./App.css";
-import { useState, useRef } from "react";
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addTodo } from "./redux/modules/todos";
+import styled from "styled-components";
 
-function App() {
-  let [todo, setTodo] = useState(["리액트를 공부해봅시다.", "푹 쉬기"]);
-  let [tempTodo, setTempTodo] = useState("");
+const App = () => {
+  const [tempTodo, setTempTodo] = useState("");
+  const globalTodo = useSelector((state) => state.todos);
+  const dispatch = useDispatch();
 
-  const addTodoHandler = (e) => {
-    let copy = [...todo];
-    copy.push(tempTodo);
-    setTodo(copy);
+  const onClickAddTodoHandler = () => {
+    if (tempTodo.length === 0) {
+      alert("값을 입력하세요~");
+    } else {
+      dispatch(addTodo(tempTodo));
+      setTempTodo("");
+    }
   };
-
-  const inputRef = useRef(null);
-
-  const clearInput = () => {
-    inputRef.current.value = "";
-    setTempTodo("");
-  };
-
   return (
     <div className="App">
       <input
         onChange={(e) => {
           setTempTodo(e.target.value);
         }}
-        ref={(element) => (inputRef.current = element)}
+        value={tempTodo}
       />
-      <button
-        onClick={(e) => {
-          addTodoHandler();
-          clearInput();
-        }}
-      >
-        추가하기
-      </button>
+      <button onClick={onClickAddTodoHandler}>추가하기</button>
 
       <h1>Todo List</h1>
 
-      <div className="todoList">
-        {todo.map((a, i) => {
-          return <div className="todoListIndi">{a}</div>;
+      <StTodoListContainer>
+        {globalTodo.map((a) => {
+          return <StTodoBox key={a.title}>{a.title}</StTodoBox>;
         })}
-      </div>
+      </StTodoListContainer>
     </div>
   );
-}
+};
 
+const StTodoListContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
+const StTodoBox = styled.div`
+  width: 120px;
+  height: 120px;
+  border: 3px solid lightblue;
+  border-radius: 20px;
+  margin: 10px 15px 0px 0px;
+`;
 export default App;
